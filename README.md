@@ -1,12 +1,12 @@
 # 📉 Customer Churn Analysis — End-to-End Data Analytics Project
 
-> Identifying key drivers of customer attrition for a subscription-based service using Excel, Python, MySQL, and Power BI / Tableau.
+> Identifying key drivers of customer attrition for a subscription-based service using Excel, Python, MySQL, Power BI, and Tableau.
 
-![Excel](https://img.shields.io/badge/Excel-217346?style=flat&logo=microsoft-excel&logoColor=white)
-![Python](https://img.shields.io/badge/Python-3776AB?style=flat&logo=python&logoColor=white)
-![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=flat&logo=mysql&logoColor=white)
-![Power BI](https://img.shields.io/badge/Power%20BI-F2C811?style=flat&logo=powerbi&logoColor=black)
-![Tableau](https://img.shields.io/badge/Tableau-E97627?style=flat&logo=tableau&logoColor=white)
+![Excel](https://img.shields.io/badge/Excel-217346?style=flat-square&logo=microsoftexcel&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=flat-square&logo=mysql&logoColor=white)
+![Power BI](https://img.shields.io/badge/Power%20BI-F2C811?style=flat-square&logo=powerbi&logoColor=black)
+![Tableau](https://img.shields.io/badge/Tableau-E97627?style=flat-square&logo=tableau&logoColor=white)
 
 ---
 
@@ -20,6 +20,7 @@
 - [Data Analysis](#-data-analysis)
 - [Results](#-results)
 - [Recommendations](#-recommendations)
+- [How to Run](#-how-to-run)
 - [Limitations](#️-limitations)
 
 ---
@@ -33,16 +34,19 @@ This end-to-end churn analysis project identifies the factors that drive custome
 - 💡 What actions can reduce churn
 - 💳 How behavior, spending, and contract terms influence churn
 
-> **Pipeline:** `Data Cleaning` → `Feature Engineering` → `EDA` → `SQL Analytics` → `Dashboards` → `Insights`
+**Pipeline:**
+```
+Data Cleaning → Feature Engineering → EDA → SQL Analytics → Dashboards → Insights
+```
 
 ---
 
 ## 📂 Data Source
 
-The dataset contains real-world-like subscription, demographic, and behavioral data including:
+The dataset contains real-world-like subscription, demographic, and behavioral data.
 
 | Field | Description |
-|---|---|
+|-------|-------------|
 | `customer_id` | Unique customer identifier |
 | `age` / `gender` | Demographic attributes |
 | `subscription_type` | Basic / Standard / Premium |
@@ -59,7 +63,7 @@ The dataset contains real-world-like subscription, demographic, and behavioral d
 ## 🛠️ Tools Used
 
 | Task | Tool |
-|---|---|
+|------|------|
 | Data Cleaning | Microsoft Excel |
 | EDA & Feature Engineering | Python (Pandas, NumPy, Matplotlib, Seaborn) |
 | Database Management | MySQL |
@@ -70,54 +74,40 @@ The dataset contains real-world-like subscription, demographic, and behavioral d
 
 ## 🧹 Data Cleaning & Preparation
 
-<details>
-<summary><strong>Click to expand — Full Cleaning Steps</strong></summary>
-
-<br>
-
-**✔ Missing Value Handling**
-- Numerical columns → imputed with **column median**
+**Missing Value Handling**
+- Numerical columns → imputed with column **median**
 - Categorical columns → imputed as `"Unknown"`
 
-**✔ Duplicate Removal**
+**Duplicate Removal**
 - Duplicate `customer_id` records identified and removed
 
-**✔ Outlier Treatment**
+**Outlier Treatment**
 - IQR method applied to `total_spend` and `payment_delay`
 - Extreme values capped at the **99th percentile** for visual clarity
 
-**✔ Feature Engineering**
+**Feature Engineering**
 
 | Feature | Logic | Purpose |
-|---|---|---|
+|---------|-------|---------|
 | `tenure_bucket` | Short / Medium / Long | Lifecycle segmentation |
 | `avg_monthly_spend` | `total_spend ÷ tenure` | Normalized spend metric |
 | `delay_flag` | `payment_delay > 0` | Binary late-pay indicator |
 | `high_value_customer` | spend > 90th percentile | Flag top-revenue at-risk customers |
 
-**✔ Data Export**
+**Data Export**
 - Cleaned data exported to MySQL for querying and BI reporting
-
-</details>
 
 ---
 
 ## 🔍 Exploratory Data Analysis
 
-<details>
-<summary><strong>Click to expand — EDA Insights</strong></summary>
+Visual analysis conducted in Python using **Seaborn** and **Matplotlib**, covering:
 
-<br>
-
-Visual analysis was conducted in Python using **Seaborn** and **Matplotlib**, covering:
-
-- Churn distribution heatmaps across all categorical dimensions
+- Churn distribution across all categorical dimensions
 - Customer churn by **Gender**, **Subscription Type**, and **Contract Length**
 - **Total Spend vs. Payment Delay** scatter analysis segmented by churn
 - Churn trend by **Tenure** — identifying early high-risk windows
 - Distribution of **Support Calls** among churned vs. retained customers
-
-</details>
 
 ---
 
@@ -163,7 +153,7 @@ GROUP BY subscription_type, contract_length;
 ## 🧾 Results
 
 | # | Finding |
-|---|---|
+|---|---------|
 | 🔹 | Overall churn rate: **47.37%** |
 | 🔹 | Highest churn among **Monthly contract** customers |
 | 🔹 | **Basic plan** users churn more than Premium subscribers |
@@ -177,13 +167,37 @@ GROUP BY subscription_type, contract_length;
 
 ## 📌 Recommendations
 
-- ⭐ Offer discounts to upgrade **Monthly → Quarterly / Annual** plans
-- ⭐ Improve the **onboarding journey** for new customers (0–6 months)
-- ⭐ Build an **early-warning churn model** using payment delay and support call scores
-- ⭐ Reduce payment friction via **automated reminders** before due dates
-- ⭐ Analyze **high-support-call** customers to identify systemic service issues
-- ⭐ Introduce **loyalty benefits** for long-tenure users
-- ⭐ Launch **targeted retention campaigns** for high-value, high-risk segments
+- Offer discounts to upgrade **Monthly → Quarterly / Annual** plans
+- Improve the **onboarding journey** for new customers (0–6 months)
+- Build an **early-warning churn model** using payment delay and support call scores
+- Reduce payment friction via **automated reminders** before due dates
+- Analyze **high-support-call** customers to identify systemic service issues
+- Introduce **loyalty benefits** for long-tenure users
+- Launch **targeted retention campaigns** for high-value, high-risk segments
+
+---
+
+## ▶️ How to Run
+
+1. Clone this repository
+   ```bash
+   git clone https://github.com/PagidimarriShiva/Customer_Churn_Analysis.git
+   cd Customer_Churn_Analysis
+   ```
+
+2. Install Python dependencies
+   ```bash
+   pip install pandas numpy matplotlib seaborn jupyter
+   ```
+
+3. Open the notebook
+   ```bash
+   jupyter notebook Customer_Churn_Analysis.ipynb
+   ```
+
+4. For SQL analysis, import `customer_churn_dataset.csv` into MySQL and run `customer_churn_analysis.sql`
+
+5. Open `Customer_Churn_Analysis.pbix` in Power BI Desktop to explore the dashboard
 
 ---
 
@@ -197,4 +211,10 @@ GROUP BY subscription_type, contract_length;
 
 ---
 
-*Tools: Excel • Python • MySQL • Power BI • Tableau*
+## 👤 Author
+
+**Shiva Pagidimarri**
+Data Analyst | Python · MySQL · Power BI · Tableau · Excel
+
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0A66C2?style=flat-square&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/shiva-pagidimarri/)
+[![GitHub](https://img.shields.io/badge/GitHub-181717?style=flat-square&logo=github&logoColor=white)](https://github.com/PagidimarriShiva)
