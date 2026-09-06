@@ -10,211 +10,431 @@
 
 ---
 
-## 📑 Table of Contents
+# Customer Churn Analysis
 
-- [Project Overview](#-project-overview)
-- [Data Source](#-data-source)
-- [Tools Used](#️-tools-used)
-- [Data Cleaning & Preparation](#-data-cleaning--preparation)
-- [Exploratory Data Analysis](#-exploratory-data-analysis)
-- [Data Analysis](#-data-analysis)
-- [Results](#-results)
-- [Recommendations](#-recommendations)
-- [How to Run](#-how-to-run)
-- [Limitations](#️-limitations)
+## 📌 Project Overview
+
+This project analyzes customer churn to understand **why customers leave, which customer groups have higher observed churn rates, and where the business should focus retention efforts**.
+
+The analysis follows a data analyst approach using **MySQL for data analysis and Power BI for visualization and reporting**.
+
+The project focuses on descriptive and statistical analysis rather than machine learning or individual-level churn prediction.
 
 ---
 
-## 📝 Project Overview
+## 🎯 Business Objective
 
-This end-to-end churn analysis project identifies the factors that drive customer churn using **Excel**, **Python**, **MySQL**, and BI tools (**Power BI & Tableau**). The goal is to help stakeholders understand:
+The company wants to understand customer churn and identify customer groups with higher observed churn rates so that retention efforts can be better targeted.
 
-- 🔍 Why customers are leaving
-- 📊 Which segments churn the most
-- 💡 What actions can reduce churn
-- 💳 How behavior, spending, and contract terms influence churn
+### Key Business Questions
 
-**Pipeline:**
-```
-Data Cleaning → Feature Engineering → EDA → SQL Analytics → Dashboards → Insights
-```
+1. What is the overall churn rate?
+2. Which customer characteristics are associated with churn?
+3. Do payment delays relate to churn?
+4. Do support calls relate to churn?
+5. Does usage frequency differ between churned and retained customers?
+6. Does contract length affect churn?
+7. Are there meaningful differences by subscription type or gender?
+8. What customer segments have the highest observed churn?
+9. What actions can the business take based on these findings?
 
 ---
 
-## 📂 Data Source
+## 🗂️ Dataset
 
-The dataset contains real-world-like subscription, demographic, and behavioral data.
+The dataset contains **64,374 customer records** and **12 variables**.
 
-| Field | Description |
-|-------|-------------|
-| `customer_id` | Unique customer identifier |
-| `age` / `gender` | Demographic attributes |
-| `subscription_type` | Basic / Standard / Premium |
-| `contract_length` | Monthly / Quarterly / Annual |
-| `tenure` | Months since signup |
-| `usage_frequency` | Product engagement metric |
-| `payment_delay` | Days payment was delayed |
-| `support_calls` | Number of support interactions |
-| `total_spend` | Cumulative spend amount |
-| `churn` | Target variable — 0 (retained) / 1 (churned) |
+| Column            | Description                                |
+| ----------------- | ------------------------------------------ |
+| CustomerID        | Unique customer identifier                 |
+| Age               | Customer age                               |
+| Gender            | Customer gender                            |
+| Tenure            | Customer tenure                            |
+| Usage Frequency   | Customer usage frequency                   |
+| Support Calls     | Number of support calls                    |
+| Payment Delay     | Payment delay measure                      |
+| Subscription Type | Basic, Standard, or Premium                |
+| Total Spend       | Customer total spend                       |
+| Last Interaction  | Last interaction measure                   |
+| Contract Length   | Monthly, Quarterly, or Annual              |
+| Churn             | Churn indicator: 0 = Retained, 1 = Churned |
+
+### Data Quality
+
+* Rows: **64,374**
+* Columns: **12**
+* Missing values: **0**
+* Churn values: **0 and 1**
+* Customer IDs: **64,374 unique customers**
 
 ---
 
 ## 🛠️ Tools Used
 
-| Task | Tool |
-|------|------|
-| Data Cleaning | Microsoft Excel |
-| EDA & Feature Engineering | Python (Pandas, NumPy, Matplotlib, Seaborn) |
-| Database Management | MySQL |
-| SQL Analytics | MySQL Workbench |
-| Dashboards | Power BI, Tableau |
+* **MySQL** — Data validation, cleaning checks, aggregation, segmentation, and analysis
+* **Power BI** — Dashboard development, KPI reporting, and visualization
+* **DAX** — Power BI measures for churn KPIs and analysis
+* **Python** — Exploratory analysis and statistical validation
 
 ---
 
-## 🧹 Data Cleaning & Preparation
+# 🔄 Analytical Approach
 
-**Missing Value Handling**
-- Numerical columns → imputed with column **median**
-- Categorical columns → imputed as `"Unknown"`
+The project follows a structured data analytics workflow:
 
-**Duplicate Removal**
-- Duplicate `customer_id` records identified and removed
-
-**Outlier Treatment**
-- IQR method applied to `total_spend` and `payment_delay`
-- Extreme values capped at the **99th percentile** for visual clarity
-
-**Feature Engineering**
-
-| Feature | Logic | Purpose |
-|---------|-------|---------|
-| `tenure_bucket` | Short / Medium / Long | Lifecycle segmentation |
-| `avg_monthly_spend` | `total_spend ÷ tenure` | Normalized spend metric |
-| `delay_flag` | `payment_delay > 0` | Binary late-pay indicator |
-| `high_value_customer` | spend > 90th percentile | Flag top-revenue at-risk customers |
-
-**Data Export**
-- Cleaned data exported to MySQL for querying and BI reporting
-
----
-
-## 🔍 Exploratory Data Analysis
-
-Visual analysis conducted in Python using **Seaborn** and **Matplotlib**, covering:
-
-- Churn distribution across all categorical dimensions
-- Customer churn by **Gender**, **Subscription Type**, and **Contract Length**
-- **Total Spend vs. Payment Delay** scatter analysis segmented by churn
-- Churn trend by **Tenure** — identifying early high-risk windows
-- Distribution of **Support Calls** among churned vs. retained customers
-
----
-
-## 📊 Data Analysis
-
-### Python
-
-```python
-import pandas as pd
-
-df = pd.read_csv("customer_churn.csv")
-
-# Overall churn rate
-churn_rate = df['churn'].mean() * 100
-print("Churn Rate: {:.2f}%".format(churn_rate))
-
-# Churn rate by subscription type
-print(df.groupby('subscription_type')['churn'].mean() * 100)
-
-# Feature engineering
-df['avg_monthly_spend'] = df['total_spend'] / df['tenure']
-
-threshold = df['total_spend'].quantile(0.90)
-df['high_value_customer'] = (df['total_spend'] > threshold).astype(int)
+```text
+Business Understanding
+        ↓
+Data Understanding
+        ↓
+Data Validation & Preparation
+        ↓
+Exploratory Data Analysis
+        ↓
+Churn Analysis
+        ↓
+Customer Segmentation
+        ↓
+Statistical Validation
+        ↓
+Power BI Dashboard
+        ↓
+Business Insights
+        ↓
+Recommendations
 ```
 
-### MySQL
+---
+
+# 📊 Key Findings
+
+## Overall Churn
+
+The overall observed churn rate is:
+
+**47.37%**
+
+| Customer Status | Customers | Percentage |
+| --------------- | --------: | ---------: |
+| Churned         |    30,493 |     47.37% |
+| Retained        |    33,881 |     52.63% |
+| Total           |    64,374 |       100% |
+
+---
+
+## 💳 Payment Delay
+
+Payment delay was one of the strongest observed relationships with churn.
+
+| Customer Group | Average Payment Delay |
+| -------------- | --------------------: |
+| Retained       |                 12.45 |
+| Churned        |                 22.33 |
+
+Churned customers had an average payment delay approximately **9.88 units higher** than retained customers.
+
+Payment delay groups also showed a strong increase in observed churn as delay increased.
+
+---
+
+## 📞 Support Calls
+
+| Customer Group | Average Support Calls |
+| -------------- | --------------------: |
+| Retained       |                  4.50 |
+| Churned        |                  6.40 |
+
+Churned customers had approximately **1.90 more support calls on average**.
+
+This suggests that customers with repeated support interactions should be investigated for unresolved service problems or customer dissatisfaction.
+
+---
+
+## 📱 Usage Frequency
+
+| Customer Group | Average Usage Frequency |
+| -------------- | ----------------------: |
+| Retained       |                   16.04 |
+| Churned        |                   14.01 |
+
+Churned customers had lower average usage frequency by approximately **2.03 units**.
+
+This indicates that low customer engagement is associated with higher observed churn.
+
+---
+
+## 📄 Contract Length
+
+| Contract Length | Churn Rate |
+| --------------- | ---------: |
+| Monthly         |     51.61% |
+| Annual          |     46.22% |
+| Quarterly       |     44.05% |
+
+Monthly-contract customers had the highest observed churn rate.
+
+The difference between monthly and quarterly contracts was approximately **7.56 percentage points**.
+
+---
+
+## 👥 Gender
+
+| Gender | Churn Rate |
+| ------ | ---------: |
+| Female |     55.05% |
+| Male   |     38.58% |
+
+A noticeable difference in observed churn rates exists between the two groups.
+
+However, this is an **association, not evidence that gender causes churn**. Other customer characteristics may explain part of the difference.
+
+---
+
+## 📦 Subscription Type
+
+| Subscription Type | Churn Rate |
+| ----------------- | ---------: |
+| Basic             |     48.28% |
+| Standard          |     47.33% |
+| Premium           |     46.50% |
+
+The difference between subscription types is relatively small.
+
+Therefore, subscription type appears to be a **weak standalone churn differentiator** in this dataset.
+
+---
+
+# 🔎 Customer Segmentation
+
+To identify higher-risk observed customer groups, the analysis combines multiple variables.
+
+### Key segmentation dimensions
+
+* Payment Delay
+* Support Calls
+* Usage Frequency
+* Contract Length
+
+Examples of analyzed combinations include:
+
+```text
+Payment Delay × Support Calls
+Payment Delay × Usage Frequency
+Contract Length × Payment Delay
+```
+
+The analysis indicates that customers with **high payment delays, high support-call volume, and low usage frequency** form particularly high-churn observed segments.
+
+These segments can help the business prioritize retention analysis.
+
+---
+
+# 📈 Power BI Dashboard
+
+The Power BI report contains:
+
+### Executive Overview
+
+* Total Customers
+* Churned Customers
+* Retention Rate
+* Overall Churn Rate
+* Churn by Payment Delay
+* Churn by Support Calls
+* Churn by Usage Frequency
+* Churn by Contract Length
+* Churn by Gender
+* Churn by Subscription Type
+
+### Customer Risk Segmentation
+
+* Payment Delay × Support Calls
+* Payment Delay × Usage Frequency
+* Contract Length × Payment Delay
+* High observed churn segments
+
+---
+
+# 🧮 Key DAX Measures
+
+### Total Customers
+
+```DAX
+Total Customers =
+DISTINCTCOUNT(Customer_Churn[CustomerID])
+```
+
+### Churned Customers
+
+```DAX
+Churned Customers =
+CALCULATE(
+    DISTINCTCOUNT(Customer_Churn[CustomerID]),
+    Customer_Churn[Churn] = 1
+)
+```
+
+### Retained Customers
+
+```DAX
+Retained Customers =
+CALCULATE(
+    DISTINCTCOUNT(Customer_Churn[CustomerID]),
+    Customer_Churn[Churn] = 0
+)
+```
+
+### Churn Rate
+
+```DAX
+Churn Rate =
+DIVIDE(
+    [Churned Customers],
+    [Total Customers],
+    0
+)
+```
+
+### Retention Rate
+
+```DAX
+Retention Rate =
+DIVIDE(
+    [Retained Customers],
+    [Total Customers],
+    0
+)
+```
+
+---
+
+# 🗄️ MySQL Analysis
+
+The SQL analysis covers:
+
+```text
+Data validation
+NULL checks
+Duplicate checks
+Churn distribution
+Overall churn rate
+Average metrics by churn status
+Churn by gender
+Churn by subscription type
+Churn by contract length
+Payment delay segmentation
+Support call segmentation
+Usage frequency segmentation
+Payment Delay × Support Calls
+Payment Delay × Usage Frequency
+Contract Length × Payment Delay
+```
+
+Example:
 
 ```sql
-CREATE VIEW churn_summary AS
 SELECT
-    subscription_type,
-    contract_length,
-    ROUND(SUM(churn) / COUNT(*) * 100, 2)  AS churn_rate_percent,
-    ROUND(AVG(total_spend), 2)              AS avg_spend,
-    ROUND(AVG(payment_delay), 2)            AS avg_delay
-FROM churn
-GROUP BY subscription_type, contract_length;
+    `Contract Length`,
+    COUNT(*) AS customers,
+    SUM(Churn) AS churned_customers,
+    ROUND(AVG(Churn) * 100, 2) AS churn_rate
+FROM customer_churn
+GROUP BY `Contract Length`
+ORDER BY churn_rate DESC;
 ```
 
 ---
 
-## 🧾 Results
+# 📐 Statistical Validation
 
-| # | Finding |
-|---|---------|
-| 🔹 | Overall churn rate: **47.37%** |
-| 🔹 | Highest churn among **Monthly contract** customers |
-| 🔹 | **Basic plan** users churn more than Premium subscribers |
-| 🔹 | **Payment delays** strongly correlate with churn |
-| 🔹 | Customers with **high support calls** show elevated dissatisfaction |
-| 🔹 | **Low-tenure users (0–6 months)** churn early in the lifecycle |
-| 🔹 | **Female customers** churn slightly more than male customers |
-| 🔹 | **High spenders** also churn, directly impacting revenue |
+Statistical analysis was used to validate whether observed differences between churned and retained customers were statistically meaningful.
 
----
+### Numeric Variables
 
-## 📌 Recommendations
+Independent two-sample comparisons were used for variables such as:
 
-- Offer discounts to upgrade **Monthly → Quarterly / Annual** plans
-- Improve the **onboarding journey** for new customers (0–6 months)
-- Build an **early-warning churn model** using payment delay and support call scores
-- Reduce payment friction via **automated reminders** before due dates
-- Analyze **high-support-call** customers to identify systemic service issues
-- Introduce **loyalty benefits** for long-tenure users
-- Launch **targeted retention campaigns** for high-value, high-risk segments
+* Payment Delay
+* Support Calls
+* Usage Frequency
+* Tenure
+* Total Spend
+* Age
+* Last Interaction
 
----
+Effect sizes were also considered to distinguish **statistical significance from practical importance**.
 
-## ▶️ How to Run
+### Categorical Variables
 
-1. Clone this repository
-   ```bash
-   git clone https://github.com/PagidimarriShiva/Customer_Churn_Analysis.git
-   cd Customer_Churn_Analysis
-   ```
+Chi-square tests and Cramér's V were used to evaluate associations between churn and:
 
-2. Install Python dependencies
-   ```bash
-   pip install pandas numpy matplotlib seaborn jupyter
-   ```
+* Gender
+* Contract Length
+* Subscription Type
 
-3. Open the notebook
-   ```bash
-   jupyter notebook Customer_Churn_Analysis.ipynb
-   ```
+### Important Result
 
-4. For SQL analysis, import `customer_churn_dataset.csv` into MySQL and run `customer_churn_analysis.sql`
+A variable can be statistically significant without being practically important.
 
-5. Open `Customer_Churn_Analysis.pbix` in Power BI Desktop to explore the dashboard
+For example, subscription type showed a statistically significant difference, but the practical effect was very small.
 
 ---
 
-## ⚠️ Limitations
+# 💡 Business Recommendations
 
-- Dataset does not include marketing logs or campaign exposure data
-- No timestamps available — cohort-based churn analysis is not possible
-- Payment delay may reflect billing cycle timing rather than true financial distress
-- Self-reported churn reasons are absent — qualitative drivers are unknown
-- No external factors modeled (competition, seasonality, pricing changes)
+### 1. Focus on payment-related issues
+
+Customers with high payment delays show substantially higher observed churn.
+
+Possible actions:
+
+* Proactive payment reminders
+* Billing issue resolution
+* Easier payment processes
+* Early intervention for repeated delays
+
+### 2. Investigate repeated support interactions
+
+Customers with high support-call volume should be reviewed for unresolved issues and service problems.
+
+### 3. Re-engage low-usage customers
+
+Customers with low usage frequency can be targeted with:
+
+* Product education
+* Engagement campaigns
+* Feature recommendations
+* Customer onboarding support
+
+### 4. Review monthly-contract customers
+
+Monthly customers have the highest observed churn rate.
+
+The business should investigate why these customers are more likely to leave and evaluate appropriate retention strategies.
+
+### 5. Prioritize customer segments
+
+Retention efforts should focus on combinations of risk indicators rather than relying on a single variable.
 
 ---
 
-## 👤 Author
+# ⚠️ Limitations
 
-**Shiva Pagidimarri**
-Data Analyst | Python · MySQL · Power BI · Tableau · Excel
+* The analysis identifies **associations**, not causal relationships.
+* Customer-level churn probability was not modeled.
+* No machine learning model was used.
+* The risk segments are exploratory and should not be treated as validated prediction rules.
+* `CustomerID` is an identifier and should not be used as a predictive/business feature.
+* The exact meaning/unit of `Last Interaction` is not established from the available dataset documentation.
+* Statistical significance should be interpreted together with effect size and business relevance.
 
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-0A66C2?style=flat-square&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/shiva-pagidimarri/)
-[![GitHub](https://img.shields.io/badge/GitHub-181717?style=flat-square&logo=github&logoColor=white)](https://github.com/PagidimarriShiva)
+---
+
+# 🚀 Conclusion
+
+This project demonstrates an end-to-end **Data Analyst workflow for customer churn analysis**.
+
+The analysis shows that **payment delay and support-call volume are the most practically important observed factors**, while lower usage frequency and monthly contracts also show higher observed churn.
+
+The findings provide a basis for the business to focus retention efforts on customers showing combinations of payment, support, and engagement-related risk indicators.
+
+The project intentionally focuses on **descriptive analytics, statistical validation, SQL, and Power BI**.
